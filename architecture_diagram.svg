@@ -1,0 +1,215 @@
+<svg width="900" height="620" viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+  <!-- Background -->
+  <rect width="900" height="620" fill="#0f1724" rx="12"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="17" font-weight="bold" fill="#e8edf5" letter-spacing="1">AI-Powered Assistant for Churn Prediction — Architecture</text>
+  <line x1="60" y1="50" x2="840" y2="50" stroke="#1f2d45" stroke-width="1"/>
+
+  <!-- ══ ZONE LABELS ══ -->
+  <!-- Zone 1: User -->
+  <text x="90" y="82" font-size="10" font-weight="bold" fill="#5a6a85" letter-spacing="2">MARKETING TEAM</text>
+
+  <!-- Zone 2: API Layer -->
+  <text x="358" y="82" font-size="10" font-weight="bold" fill="#5a6a85" letter-spacing="2">API LAYER</text>
+
+  <!-- Zone 3: LLM -->
+  <text x="600" y="82" font-size="10" font-weight="bold" fill="#5a6a85" letter-spacing="2">LLM (GROQ CLOUD)</text>
+
+  <!-- Zone 4: ML -->
+  <text x="770" y="82" font-size="10" font-weight="bold" fill="#5a6a85" letter-spacing="2">ML</text>
+
+  <!-- ══ MARKETING AGENT BOX ══ -->
+  <rect x="40" y="200" width="150" height="100" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="115" y="232" text-anchor="middle" font-size="22">👤</text>
+  <text x="115" y="256" text-anchor="middle" font-size="12" font-weight="bold" fill="#e8edf5">Marketing Agent</text>
+  <text x="115" y="272" text-anchor="middle" font-size="10" fill="#5a6a85">natural language</text>
+
+  <!-- Chat Tester Box -->
+  <rect x="40" y="330" width="150" height="80" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="115" y="358" text-anchor="middle" font-size="18">🌐</text>
+  <text x="115" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="#e8edf5">chat_tester.html</text>
+  <text x="115" y="394" text-anchor="middle" font-size="9" fill="#5a6a85">Browser UI</text>
+
+  <!-- ══ FASTAPI BOX ══ -->
+  <rect x="245" y="150" width="175" height="330" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="333" y="175" text-anchor="middle" font-size="11" font-weight="bold" fill="#00d4ff">FastAPI  (api.py)</text>
+
+  <!-- Endpoints inside FastAPI -->
+  <rect x="260" y="185" width="145" height="25" rx="5" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="333" y="202" text-anchor="middle" font-size="9" fill="#00ffaa">POST /chat/start</text>
+
+  <rect x="260" y="215" width="145" height="25" rx="5" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="333" y="232" text-anchor="middle" font-size="9" fill="#00ffaa">POST /chat/message</text>
+
+  <rect x="260" y="245" width="145" height="25" rx="5" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="333" y="262" text-anchor="middle" font-size="9" fill="#00ffaa">GET  /chat/status</text>
+
+  <rect x="260" y="275" width="145" height="25" rx="5" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="333" y="292" text-anchor="middle" font-size="9" fill="#00ffaa">POST /chat/reset</text>
+
+  <rect x="260" y="305" width="145" height="25" rx="5" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="333" y="322" text-anchor="middle" font-size="9" fill="#00ffaa">GET  /health</text>
+
+  <!-- Session Store badge -->
+  <rect x="263" y="345" width="140" height="30" rx="5" fill="#1a2235" stroke="#1f2d45"/>
+  <text x="333" y="364" text-anchor="middle" font-size="9" fill="#5a6a85">in-memory session store</text>
+
+  <!-- Swagger docs note -->
+  <rect x="263" y="382" width="140" height="30" rx="5" fill="#1a2235" stroke="#1f2d45"/>
+  <text x="333" y="401" text-anchor="middle" font-size="9" fill="#5a6a85">/docs  Swagger UI</text>
+
+  <!-- ChurnChatSession -->
+  <rect x="263" y="420" width="140" height="42" rx="5" fill="#1a2235" stroke="#00d4ff44"/>
+  <text x="333" y="438" text-anchor="middle" font-size="9" font-weight="bold" fill="#00d4ff">ChurnChatSession</text>
+  <text x="333" y="454" text-anchor="middle" font-size="8" fill="#5a6a85">history · collected · state</text>
+
+  <!-- ══ CHATBOT PIPELINE BOX ══ -->
+  <rect x="470" y="150" width="175" height="330" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="558" y="175" text-anchor="middle" font-size="11" font-weight="bold" fill="#00d4ff">chatbot_pipeline.py</text>
+
+  <!-- Steps inside pipeline -->
+  <rect x="483" y="185" width="150" height="30" rx="5" fill="#0b0f1a" stroke="#00ffaa44"/>
+  <text x="558" y="198" text-anchor="middle" font-size="9" font-weight="bold" fill="#00ffaa">① Feature Extraction</text>
+  <text x="558" y="210" text-anchor="middle" font-size="8" fill="#5a6a85">LLM parses natural language → JSON</text>
+
+  <rect x="483" y="222" width="150" height="30" rx="5" fill="#0b0f1a" stroke="#00ffaa44"/>
+  <text x="558" y="235" text-anchor="middle" font-size="9" font-weight="bold" fill="#00ffaa">② Missing Field Detection</text>
+  <text x="558" y="247" text-anchor="middle" font-size="8" fill="#5a6a85">get_missing_fields() → ask agent</text>
+
+  <rect x="483" y="259" width="150" height="30" rx="5" fill="#0b0f1a" stroke="#00ffaa44"/>
+  <text x="558" y="272" text-anchor="middle" font-size="9" font-weight="bold" fill="#00ffaa">③ Encoding</text>
+  <text x="558" y="284" text-anchor="middle" font-size="8" fill="#5a6a85">encode_features.py (dict maps)</text>
+
+  <rect x="483" y="296" width="150" height="30" rx="5" fill="#0b0f1a" stroke="#00ffaa44"/>
+  <text x="558" y="309" text-anchor="middle" font-size="9" font-weight="bold" fill="#00ffaa">④ ML Prediction</text>
+  <text x="558" y="321" text-anchor="middle" font-size="8" fill="#5a6a85">RandomForest → churn probability</text>
+
+  <rect x="483" y="333" width="150" height="30" rx="5" fill="#0b0f1a" stroke="#00ffaa44"/>
+  <text x="558" y="346" text-anchor="middle" font-size="9" font-weight="bold" fill="#00ffaa">⑤ Result Explanation</text>
+  <text x="558" y="358" text-anchor="middle" font-size="8" fill="#5a6a85">LLM formats plain-English output</text>
+
+  <!-- Encode features note -->
+  <rect x="483" y="370" width="150" height="42" rx="5" fill="#1a2235" stroke="#1f2d45"/>
+  <text x="558" y="388" text-anchor="middle" font-size="9" font-weight="bold" fill="#e8edf5">encode_features.py</text>
+  <text x="558" y="403" text-anchor="middle" font-size="8" fill="#5a6a85">binary · ordinal · OHE</text>
+  <text x="558" y="415" text-anchor="middle" font-size="8" fill="#5a6a85">no sklearn — portable</text>
+
+  <!-- ══ GROQ CLOUD BOX ══ -->
+  <rect x="695" y="150" width="155" height="130" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="773" y="175" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffd166">Groq Cloud</text>
+  <text x="773" y="192" text-anchor="middle" font-size="9" fill="#5a6a85">open-source LLMs</text>
+
+  <rect x="708" y="200" width="129" height="22" rx="4" fill="#0b0f1a" stroke="#ffd16644"/>
+  <text x="773" y="215" text-anchor="middle" font-size="9" fill="#ffd166">llama-3.3-70b-versatile</text>
+
+  <rect x="708" y="228" width="129" height="22" rx="4" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="773" y="243" text-anchor="middle" font-size="9" fill="#5a6a85">mixtral-8x7b-32768</text>
+
+  <rect x="708" y="256" width="129" height="22" rx="4" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="773" y="271" text-anchor="middle" font-size="9" fill="#5a6a85">llama3-8b-8192</text>
+
+  <!-- ══ ML MODEL BOX ══ -->
+  <rect x="695" y="310" width="155" height="170" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+  <text x="773" y="335" text-anchor="middle" font-size="11" font-weight="bold" fill="#ff6b6b">ML Model</text>
+
+  <rect x="708" y="343" width="129" height="32" rx="4" fill="#0b0f1a" stroke="#ff6b6b44"/>
+  <text x="773" y="357" text-anchor="middle" font-size="9" font-weight="bold" fill="#ff6b6b">Random Forest</text>
+  <text x="773" y="370" text-anchor="middle" font-size="8" fill="#5a6a85">Test AUC 0.8356 · CV 0.8512</text>
+
+  <rect x="708" y="382" width="129" height="40" rx="4" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="773" y="397" text-anchor="middle" font-size="9" fill="#5a6a85">churn_model.pkl</text>
+  <text x="773" y="411" text-anchor="middle" font-size="9" fill="#5a6a85">feature_names.json</text>
+
+  <!-- Risk tiers -->
+  <rect x="708" y="429" width="38" height="38" rx="4" fill="#00ffaa22" stroke="#00ffaa44"/>
+  <text x="727" y="446" text-anchor="middle" font-size="8" fill="#00ffaa">LOW</text>
+  <text x="727" y="460" text-anchor="middle" font-size="8" fill="#00ffaa">&lt;40%</text>
+
+  <rect x="751" y="429" width="38" height="38" rx="4" fill="#ffd16622" stroke="#ffd16644"/>
+  <text x="770" y="446" text-anchor="middle" font-size="8" fill="#ffd166">MED</text>
+  <text x="770" y="460" text-anchor="middle" font-size="8" fill="#ffd166">40-70%</text>
+
+  <rect x="794" y="429" width="38" height="38" rx="4" fill="#ff6b6b22" stroke="#ff6b6b44"/>
+  <text x="813" y="446" text-anchor="middle" font-size="8" fill="#ff6b6b">HIGH</text>
+  <text x="813" y="460" text-anchor="middle" font-size="8" fill="#ff6b6b">≥70%</text>
+
+  <!-- ══ ARROWS ══ -->
+  <!-- Agent → FastAPI (REST) -->
+  <line x1="190" y1="250" x2="243" y2="250" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowBlue)"/>
+  <text x="216" y="243" text-anchor="middle" font-size="8" fill="#00d4ff">HTTP</text>
+
+  <!-- Chat Tester → FastAPI -->
+  <line x1="190" y1="370" x2="243" y2="310" stroke="#5a6a85" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowGray)"/>
+
+  <!-- FastAPI → Pipeline -->
+  <line x1="420" y1="300" x2="468" y2="300" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+
+  <!-- Pipeline → Groq (extraction call) -->
+  <line x1="645" y1="210" x2="693" y2="210" stroke="#ffd166" stroke-width="1.5" marker-end="url(#arrowYellow)"/>
+  <text x="669" y="204" text-anchor="middle" font-size="7" fill="#ffd166">extract</text>
+
+  <!-- Groq → Pipeline (JSON back) -->
+  <line x1="693" y1="225" x2="645" y2="225" stroke="#ffd166" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#arrowYellow)"/>
+  <text x="669" y="238" text-anchor="middle" font-size="7" fill="#ffd166">JSON</text>
+
+  <!-- Pipeline → Groq (explain call) -->
+  <line x1="645" y1="355" x2="693" y2="355" stroke="#ffd166" stroke-width="1.5" marker-end="url(#arrowYellow)"/>
+  <text x="669" y="348" text-anchor="middle" font-size="7" fill="#ffd166">explain</text>
+
+  <!-- Pipeline → ML Model -->
+  <line x1="645" y1="310" x2="693" y2="360" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="672" y="328" text-anchor="middle" font-size="7" fill="#ff6b6b">predict</text>
+
+  <!-- ML → Pipeline -->
+  <line x1="693" y1="375" x2="645" y2="330" stroke="#ff6b6b" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#arrowRed)"/>
+  <text x="662" y="348" text-anchor="middle" font-size="7" fill="#ff6b6b">proba</text>
+
+  <!-- ══ ARROW MARKERS ══ -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff"/>
+    </marker>
+    <marker id="arrowYellow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ffd166"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ff6b6b"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#5a6a85"/>
+    </marker>
+  </defs>
+
+  <!-- ══ DATA FLOW LEGEND ══ -->
+  <rect x="40" y="460" width="590" height="130" rx="8" fill="#111827" stroke="#1f2d45"/>
+  <text x="60" y="480" font-size="10" font-weight="bold" fill="#5a6a85" letter-spacing="1">CONVERSATION FLOW</text>
+
+  <text x="60" y="500" font-size="9" fill="#e8edf5">①</text>
+  <text x="75" y="500" font-size="9" fill="#5a6a85">Agent sends natural-language message about a customer via</text>
+  <text x="75" y="513" font-size="9" fill="#00d4ff">POST /chat/message</text>
+
+  <text x="60" y="528" font-size="9" fill="#e8edf5">②</text>
+  <text x="75" y="528" font-size="9" fill="#5a6a85">Pipeline calls Groq LLM to extract structured features (JSON) from the message</text>
+
+  <text x="60" y="543" font-size="9" fill="#e8edf5">③</text>
+  <text x="75" y="543" font-size="9" fill="#5a6a85">Missing fields detected → LLM generates a follow-up question for the agent</text>
+
+  <text x="60" y="558" font-size="9" fill="#e8edf5">④</text>
+  <text x="75" y="558" font-size="9" fill="#5a6a85">Once all 19 fields collected → encode_features.py encodes → RandomForest predicts churn probability</text>
+
+  <text x="60" y="573" font-size="9" fill="#e8edf5">⑤</text>
+  <text x="75" y="573" font-size="9" fill="#5a6a85">Groq LLM explains result in plain English (risk tier + recommendation) → returned to agent</text>
+
+  <!-- ══ LEGEND COLORS ══ -->
+  <rect x="645" y="500" width="195" height="85" rx="6" fill="#0b0f1a" stroke="#1f2d45"/>
+  <text x="738" y="517" text-anchor="middle" font-size="9" font-weight="bold" fill="#5a6a85">LEGEND</text>
+  <line x1="655" y1="530" x2="680" y2="530" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="688" y="534" font-size="8" fill="#5a6a85">API / session calls</text>
+  <line x1="655" y1="548" x2="680" y2="548" stroke="#ffd166" stroke-width="1.5"/>
+  <text x="688" y="552" font-size="8" fill="#5a6a85">LLM calls (Groq)</text>
+  <line x1="655" y1="566" x2="680" y2="566" stroke="#ff6b6b" stroke-width="1.5"/>
+  <text x="688" y="570" font-size="8" fill="#5a6a85">ML inference</text>
+  <line x1="655" y1="578" x2="680" y2="578" stroke="#5a6a85" stroke-width="1.2" stroke-dasharray="3,2"/>
+  <text x="688" y="582" font-size="8" fill="#5a6a85">response / return</text>
+</svg>
