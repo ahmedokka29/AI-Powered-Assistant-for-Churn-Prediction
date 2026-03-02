@@ -58,7 +58,7 @@ project/
 ├── churn_classification.py       ← full modelling notebook / script
 ├── chatbot_pipeline.py           ← LLM + ML orchestration logic
 ├── api.py                        ← FastAPI REST endpoints
-├── chat_tester.html              ← browser-based chat UI for testing
+├── streamlit_app.py              ← Streamlit chat UI
 ├── .env                          ← GROQ_API_KEY goes here (never commit this)
 ├── requirements.txt
 └── README.md
@@ -103,29 +103,32 @@ uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 
 The API is live. Open **http://localhost:8000/docs** for the interactive Swagger UI.
 
-### 4. Open the chat tester
+### 4. Launch the Streamlit UI
 
-Open `chat_tester.html` directly in your browser — no extra server needed. Click **Start New Session** to begin.
+```bash
+streamlit run streamlit_app.py
+```
+
+The app opens automatically at **http://localhost:8501**. Click **▶ New Session** in the sidebar to begin.
 
 ---
 
-## Chat Tester UI
+## Streamlit UI
 
-`chat_tester.html` is a self-contained browser interface for testing the API conversationally.
+Run `streamlit run streamlit_app.py` — the app opens at **http://localhost:8501**.
 
 **Left sidebar:**
-- API base URL field — change port if needed
-- Live connection indicator (polls `/health` every 10 seconds — green when connected)
-- **Start New Session** / **Reset Session** buttons
+- API base URL field — change port if needed (default: http://localhost:8000)
+- Live connection indicator — green ✅ when the FastAPI server is reachable
+- **▶ New Session** / **↺ Reset** buttons
 - Session ID display
 - Field tracker — all 19 features listed, turn green ✅ as the bot collects them
-- Prediction result card — appears when done, shows probability %, risk tier badge, and a colored progress bar
+- Prediction result card — appears when done, shows probability %, risk tier badge, and a colored bar
 
 **Chat area:**
-- Typing indicator (bouncing dots) while the LLM responds
-- Messages animate in with fade-up
-- Enter to send, Shift+Enter for new line
-- After a prediction, click **Reset Session** in the sidebar to start a fresh customer assessment
+- Native Streamlit chat interface with user/assistant bubbles
+- Spinner while the LLM is responding
+- After a prediction, click **↺ Reset** in the sidebar to start a fresh customer assessment
 
 ---
 
@@ -262,7 +265,7 @@ The LLM infers several fields automatically from natural language — agents can
 
            [Sidebar: 86% · HIGH RISK · red bar · all 19 fields green]
 
-👤 Agent:  [Clicks "Reset Session" to assess the next customer]
+👤 Agent:  [Clicks "↺ Reset" in the sidebar to assess the next customer]
 ```
 
 ---
