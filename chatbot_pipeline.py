@@ -43,7 +43,8 @@ _groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 # ── Load ML artifacts once at import time ─────────────────────────────────────
 _model = joblib.load(MODEL_PATH)
-_feature_names: list[str] = json.load(open(FEATURES_PATH))
+with open(FEATURES_PATH) as f:
+    _feature_names: list[str] = json.load(f)
 
 
 # ── Feature schema ─────────────────────────────────────────────────────────────
@@ -148,35 +149,39 @@ EXTRACTION_SYSTEM_PROMPT = """You are a strict data extraction engine for a tele
 
 Your ONLY output must be a single valid JSON object. No prose. No markdown. No explanation. No code fences.
 
-EXTRACTION RULES:
-- Extract every feature that can be inferred from the conversation, even indirectly.
-- Normalize all values: lowercase, underscores instead of spaces/hyphens.
-- Never include a field if you are genuinely unsure — omit it rather than guess.
+CRITICAL RULES — READ CAREFULLY:
+- Extract ONLY information that was EXPLICITLY stated by the user. 
+- DO NOT infer, assume, or guess any field that was not directly mentioned.
+- DO NOT extract values from questions or suggestions — only from direct user statements.
+- If you are not 100% certain a field was stated, OMIT IT. An empty JSON {} is correct when little info is given.
+- Normalize all extracted values: lowercase, underscores instead of spaces/hyphens.
+
+ALLOWED INFERENCE ALIASES (only apply these exact rules, nothing else):
 - "pays by electronic check" → payment_method = "electronic_check" AND paperless_billing = "yes"
-- "senior citizen" or age >= 65 → senior_citizen = 1 ; age clearly under 65 → senior_citizen = 0
-- "married" → is_married = "yes" ; "single/unmarried" → is_married = "no"
-- "has dependents/children" → dependents = "yes"
+- "senior citizen" or age >= 65 → senior_citizen = 1 ; age clearly stated under 65 → senior_citizen = 0
+- "married" → is_married = "yes" ; "single" or "unmarried" → is_married = "no"
+- "has dependents" or "has children" → dependents = "yes" ; "no dependents" or "no children" → dependents = "no"
 - "fiber optic" or "fiber" → internet_service = "fiber_optic"
-- "no internet" → internet_service = "no" AND set online_security/online_backup/device_protection/tech_support/streaming_tv/streaming_movies = "no_internet_service"
+- "no internet" or "no internet service" → internet_service = "no" AND online_security = "no_internet_service" AND online_backup = "no_internet_service" AND device_protection = "no_internet_service" AND tech_support = "no_internet_service" AND streaming_tv = "no_internet_service" AND streaming_movies = "no_internet_service"
 - "no phone service" → phone_service = "no" AND dual = "no_phone_service"
-- "streams TV and movies" → streaming_tv = "yes", streaming_movies = "yes"
+- "streams TV and movies" → streaming_tv = "yes" AND streaming_movies = "yes"
 - "month-to-month" or "monthly contract" → contract = "month_to_month"
-- "one year contract" → contract = "one_year" ; "two year" → contract = "two_year"
+- "one year contract" or "1 year contract" → contract = "one_year"
+- "two year contract" or "2 year contract" → contract = "two_year"
 - "electronic check" → payment_method = "electronic_check"
 - "mailed check" or "postal check" → payment_method = "mailed_check"
-- "bank transfer" → payment_method = "bank_transfer_automatic"
-- "credit card" → payment_method = "credit_card_automatic"
-- "$X/month" or "X dollars monthly" → monthly_charges = X (number only)
-- "total of $X" or "billed X so far" → total_charges = X (number only)
-- "X months with us" or "tenure of X" → tenure = X (number only)
+- "bank transfer" or "automatic bank transfer" → payment_method = "bank_transfer_automatic"
+- "credit card" or "automatic credit card" → payment_method = "credit_card_automatic"
+- "$X/month" or "X dollars monthly" or "X per month" → monthly_charges = X (number only)
+- "total of $X" or "billed X so far" or "total charges X" → total_charges = X (number only)
+- "X months with us" or "tenure of X" or "been with us X months" → tenure = X (number only)
 - "no online security" → online_security = "no"
 - "no backup" or "no online backup" → online_backup = "no"
 - "no tech support" → tech_support = "no"
 - "no device protection" → device_protection = "no"
-- "paperless" or "e-billing" → paperless_billing = "yes" ; "paper bill" → paperless_billing = "no"
-- "dual line" or "two lines" → dual = "yes" ; "single line" or "one line" → dual = "no"
-- If phone_service = "no" is confirmed → dual = "no_phone_service" (infer automatically)
-- "no second line" or "just one line" → dual = "no"
+- "paperless" or "e-billing" or "electronic billing" → paperless_billing = "yes" ; "paper bill" or "paper billing" → paperless_billing = "no"
+- "dual line" or "two lines" or "second line" → dual = "yes" ; "single line" or "one line" or "no second line" → dual = "no"
+- If phone_service = "no" is explicitly confirmed → dual = "no_phone_service"
 
 VALID FIELD VALUES:
 gender: male|female | senior_citizen: 0|1 | is_married: yes|no | dependents: yes|no
@@ -187,7 +192,13 @@ contract: month_to_month|one_year|two_year | paperless_billing: yes|no
 payment_method: electronic_check|mailed_check|bank_transfer_automatic|credit_card_automatic
 monthly_charges: <number> | total_charges: <number>
 
-EXAMPLE:
+EXAMPLES (shows sparse output when little info is given):
+Input: "The customer is male."
+Output: {"gender":"male"}
+
+Input: "Female, 24 years old, no phone service, $45/month."
+Output: {"gender":"female","senior_citizen":0,"phone_service":"no","dual":"no_phone_service","monthly_charges":45}
+
 Input: "Male, 58yo senior, married, dependents, 12 months, phone, fiber optic, no security/backup/tech support, streams TV+movies, month-to-month, electronic check, $95/month, total $1140"
 Output: {"gender":"male","senior_citizen":1,"is_married":"yes","dependents":"yes","tenure":12,"phone_service":"yes","internet_service":"fiber_optic","online_security":"no","online_backup":"no","tech_support":"no","streaming_tv":"yes","streaming_movies":"yes","contract":"month_to_month","payment_method":"electronic_check","paperless_billing":"yes","monthly_charges":95,"total_charges":1140}
 
@@ -195,11 +206,21 @@ Output JSON ONLY. Nothing else."""
 
 
 def extract_features_from_conversation(history: list[dict]) -> dict:
-    """Ask the LLM to parse collected features from the full conversation."""
+    """
+    Ask the LLM to parse collected features from the full conversation.
+
+    IMPORTANT: Only user turns are passed to the extraction LLM.
+    Assistant messages (questions, suggestions) are excluded so the model
+    cannot mistake the assistant's phrasing for user-provided information.
+    """
+    # Filter to user-authored messages only — prevents the model from
+    # extracting features out of the assistant's own questions/suggestions.
+    user_turns_only = [m for m in history if m["role"] == "user"]
+
     messages = [
         {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},
-        *history,
-        {"role": "user", "content": "Extract ALL customer features mentioned anywhere in this conversation. Be thorough — use the alias rules. Return JSON only, no other text."}
+        *user_turns_only,
+        {"role": "user", "content": "Extract ONLY the customer features explicitly stated in the messages above. Do NOT guess or infer anything not directly stated. Return JSON only, no other text."}
     ]
     # zero temp = deterministic extraction
     raw = _call_groq(messages, temperature=0.0)
@@ -336,6 +357,23 @@ def explain_result(prediction: dict, collected_features: dict, history: list[dic
     messages = [
         {"role": "system", "content": EXPLANATION_SYSTEM_PROMPT},
         {"role": "user",   "content": summary},
+    ]
+    return _call_groq(messages)
+
+
+def answer_followup(question: str, prediction: dict) -> str:
+    """
+    Handle a follow-up question from the marketing agent after a prediction
+    has already been delivered.  Keeps all LLM logic in one place.
+    """
+    prompt = (
+        f"The churn prediction result was: {json.dumps(prediction)}.\n"
+        f"The agent asks: {question}\n"
+        f"Answer clearly and helpfully in 2-3 sentences."
+    )
+    messages = [
+        {"role": "system", "content": EXPLANATION_SYSTEM_PROMPT},
+        {"role": "user",   "content": prompt},
     ]
     return _call_groq(messages)
 

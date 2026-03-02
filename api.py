@@ -21,7 +21,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from chatbot_pipeline import ChurnChatSession, get_missing_fields
+from chatbot_pipeline import ChurnChatSession, get_missing_fields, answer_followup
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -42,8 +42,6 @@ app.add_middleware(
     allow_credentials=False,
 )
 
-# In-memory session store  {session_id: ChurnChatSession}
-# Replace with Redis for multi-worker / production deployments
 _sessions: dict[str, ChurnChatSession] = {}
 
 
@@ -117,19 +115,9 @@ def send_message(body: MessageRequest):
     session = _get_session(body.session_id)
 
     if session.prediction_done:
-        # Allow follow-up questions after prediction
+        # Prediction already delivered — answer any follow-up question from the agent
         session._add("user", body.message)
-        from chatbot_pipeline import EXPLANATION_SYSTEM_PROMPT, _call_groq, GROQ_MODEL
-        import json
-        follow_up_prompt = (
-            f"The churn prediction result was: {json.dumps(session.last_prediction)}.\n"
-            f"The user asks: {body.message}\n"
-            f"Answer their follow-up question clearly and helpfully."
-        )
-        reply = _call_groq([
-            {"role": "system", "content": EXPLANATION_SYSTEM_PROMPT},
-            {"role": "user",   "content": follow_up_prompt},
-        ])
+        reply = answer_followup(body.message, session.last_prediction)
         session._add("assistant", reply)
     else:
         reply = session.respond(body.message)
